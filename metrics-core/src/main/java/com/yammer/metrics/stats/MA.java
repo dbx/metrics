@@ -46,6 +46,7 @@ public class MA {
 
     public void tick() {
         final long count = uncounted.getAndSet(0);
+       // System.out.println("count in last 5 s: " + count);
         m5Sum.addAndGet(count);
 
         Long first = (Long) m5Fifo.remove();
@@ -57,13 +58,7 @@ public class MA {
 
         rate = m5Sum.get() / 60.0;
         m5Fifo.add(new Long(count));
-        for (Object o : m5Fifo) {
-            Long l = (Long) o;
-            System.out.print(l + ";");
-        }
-        System.out.println();
-        System.out.println(">" + rate);
-        System.out.println(">>" + m5Sum.get());
+
     }
 
     /**
