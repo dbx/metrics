@@ -15,15 +15,15 @@ import java.util.concurrent.TimeUnit;
 public class MATest {
 
     public static void main(String[] args) {
-        Meter m = Metrics.newMeter(MATest.class, "", "", TimeUnit.SECONDS);
+        Meter m = Metrics.newMeter(MATest.class, "testMeter", "maTest", TimeUnit.SECONDS);
         for (int i = 0; i < 100; i++) {
-
+            System.out.println("-----------------------");
             m.mark(i);
             System.out.println(m.fiveMinuteMA());
 
             try {
                 Thread.sleep(5000);
-                System.out.println("-----------------------");
+
             } catch (InterruptedException e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }

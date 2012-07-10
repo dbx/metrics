@@ -1,0 +1,46 @@
+<project name="metrics" default="jar-metrics-core" basedir=".">
+    <dirname property="metrics.basedir" file="${ant.file.metrics}"/>
+
+    <property name="metrics.core.src.main.java" value="${metrics.basedir}/metrics-core/src/main/java"/>
+    <property name="metrics.core.target" value="${metrics.basedir}/metrics-core/target"/>
+    <property name="metrics.core.target.classes" value="${metrics.core.target}/classes"/>
+    <property name="metrics.core.target.dist" value="${metrics.core.target}/dist"/>
+
+    <property name="metrics.core.jarname" value="metrics-core-dbx.jar"/>
+    <property name="metrics.core.jarfile" value="${metrics.core.target.dist}/${metrics.core.jarname}"/>
+
+    <property name="debug" value="false"/>
+    <property name="verbose" value="false"/>
+
+    <path id="lib">
+        <fileset dir="${metrics.basedir}/lib">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+
+    <target name="clean" description="clean up">
+        <delete dir="${metrics.core.target}" quiet="true"/>
+    </target>
+
+
+    <target name="init" depends="clean">
+        <tstamp/>
+        <mkdir dir="${metrics.core.target.classes}"/>
+        <mkdir dir="${metrics.core.target.dist}"/>
+    </target>
+
+
+    <target name="compile-metrics-core" depends="clean,init" description="compile the source ">
+        <javac srcdir="${metrics.core.src.main.java}"
+               destdir="${metrics.core.target.classes}"
+               classpathref="lib"
+               debug="on" debuglevel="lines,vars,source" />
+    </target>
+
+    <target name="jar-metrics-core" depends="compile-metrics-core">
+        <jar destfile="${metrics.core.jarfile}" duplicate="preserve">
+			<fileset dir="${metrics.core.target.classes}" />
+		</jar>
+	</target>
+
+</project>
