@@ -1,6 +1,7 @@
 package com.yammer.metrics.core;
 
 import com.yammer.metrics.stats.EWMA;
+import com.yammer.metrics.stats.MA;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -19,6 +20,7 @@ public class Meter implements Metered, Stoppable {
     private final EWMA m1Rate = EWMA.oneMinuteEWMA();
     private final EWMA m5Rate = EWMA.fiveMinuteEWMA();
     private final EWMA m15Rate = EWMA.fifteenMinuteEWMA();
+    private final MA m5_Rate = MA.fiveMinuteMA();
 
     private final AtomicLong count = new AtomicLong();
     private final long startTime;
@@ -66,6 +68,7 @@ public class Meter implements Metered, Stoppable {
         m1Rate.tick();
         m5Rate.tick();
         m15Rate.tick();
+        m5_Rate.tick();
     }
 
     /**
@@ -85,6 +88,7 @@ public class Meter implements Metered, Stoppable {
         m1Rate.update(n);
         m5Rate.update(n);
         m15Rate.update(n);
+        m5_Rate.update(n);
     }
 
     @Override
@@ -100,6 +104,10 @@ public class Meter implements Metered, Stoppable {
     @Override
     public double fiveMinuteRate() {
         return m5Rate.rate(rateUnit);
+    }
+
+    public double fiveMinuteMA() {
+        return m5_Rate.rate(rateUnit);
     }
 
     @Override
