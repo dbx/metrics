@@ -14,24 +14,33 @@ import java.util.concurrent.atomic.AtomicLong;
 public class MA {
     private static final int SLOT_PER_MINUTE = 12;
     private static final int FIVE_MINUTES = 5;
+    private static final int ONE_MINUTES = 1;
 
     private volatile double rate = 0.0;
+    private double seconds;
 
     private final AtomicLong uncounted = new AtomicLong();
-    private final Buffer m5Fifo = BufferUtils.synchronizedBuffer(new CircularFifoBuffer(60));
-    private final AtomicLong m5Sum = new AtomicLong();
+    private Buffer fifo;
+    private final AtomicLong sumInWindow = new AtomicLong();
 
     public static MA fiveMinuteMA() {
-        return new MA(SLOT_PER_MINUTE * FIVE_MINUTES);
+        return new MA(FIVE_MINUTES);
+    }
+
+    public static MA oneMinuteMA() {
+        return new MA(ONE_MINUTES);
     }
 
     /**
      * Create a new MA
      *
      */
-    public MA(int slots) {
+    public MA(int minutes) {
+        int slots = SLOT_PER_MINUTE * minutes;
+        seconds = minutes * 60.0;
+        fifo = BufferUtils.synchronizedBuffer(new CircularFifoBuffer(slots));
         for (int i = 0; i < slots; i++) {
-            this.m5Fifo.add(new Long(0));
+            this.fifo.add(new Long(0));
         }
     }
 
@@ -46,18 +55,17 @@ public class MA {
 
     public void tick() {
         final long count = uncounted.getAndSet(0);
-       // System.out.println("count in last 5 s: " + count);
-        m5Sum.addAndGet(count);
+        sumInWindow.addAndGet(count);
 
-        Long first = (Long) m5Fifo.remove();
+        Long first = (Long) fifo.remove();
         long f = first.longValue();
         if (f != 0) {
             f = (-1) * f;
         }
-        m5Sum.addAndGet(f);
+        sumInWindow.addAndGet(f);
 
-        rate = m5Sum.get() / 60.0;
-        m5Fifo.add(new Long(count));
+        rate = sumInWindow.get() / seconds;
+        fifo.add(new Long(count));
 
     }
 
@@ -70,6 +78,10 @@ public class MA {
     public double rate(TimeUnit rateUnit) {
         //return rate * (double) rateUnit.toNanos(1);
         return rate;
+    }
+
+    public long sumInWindow() {
+        return sumInWindow.get();
     }
 }
 
