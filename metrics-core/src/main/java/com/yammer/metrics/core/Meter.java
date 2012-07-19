@@ -20,7 +20,9 @@ public class Meter implements Metered, Stoppable {
     private final EWMA m1Rate = EWMA.oneMinuteEWMA();
     private final EWMA m5Rate = EWMA.fiveMinuteEWMA();
     private final EWMA m15Rate = EWMA.fifteenMinuteEWMA();
+    private final MA m1_Rate = MA.oneMinuteMA();
     private final MA m5_Rate = MA.fiveMinuteMA();
+
 
     private final AtomicLong count = new AtomicLong();
     private final long startTime;
@@ -68,7 +70,9 @@ public class Meter implements Metered, Stoppable {
         m1Rate.tick();
         m5Rate.tick();
         m15Rate.tick();
+        m1_Rate.tick();
         m5_Rate.tick();
+
     }
 
     /**
@@ -88,6 +92,7 @@ public class Meter implements Metered, Stoppable {
         m1Rate.update(n);
         m5Rate.update(n);
         m15Rate.update(n);
+        m1_Rate.update(n);
         m5_Rate.update(n);
     }
 
@@ -106,8 +111,20 @@ public class Meter implements Metered, Stoppable {
         return m5Rate.rate(rateUnit);
     }
 
-    public double fiveMinuteMA() {
+    public double fiveMinuteMARate() {
         return m5_Rate.rate(rateUnit);
+    }
+
+    public double oneMinuteMARate() {
+        return m1_Rate.rate(rateUnit);
+    }
+
+    public double oneMinuteMASum() {
+        return m1_Rate.sumInWindow();
+    }
+
+    public double fiveMinuteMASum() {
+        return m5_Rate.sumInWindow();
     }
 
     @Override
