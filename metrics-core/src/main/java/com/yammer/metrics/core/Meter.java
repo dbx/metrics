@@ -119,12 +119,20 @@ public class Meter implements Metered, Stoppable {
         return m1_Rate.rate(rateUnit);
     }
 
-    public double oneMinuteMASum() {
+    public long oneMinuteMASum() {
         return m1_Rate.sumInWindow();
     }
 
-    public double fiveMinuteMASum() {
+    public long oneMinuteMASumNow() {
+        return m1_Rate.sumInWindowNow();
+    }
+
+    public long fiveMinuteMASum() {
         return m5_Rate.sumInWindow();
+    }
+
+    public long fiveMinuteMASumNow() {
+        return m5_Rate.sumInWindowNow();
     }
 
     @Override

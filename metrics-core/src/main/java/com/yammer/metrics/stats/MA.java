@@ -83,5 +83,10 @@ public class MA {
     public long sumInWindow() {
         return sumInWindow.get();
     }
+
+    public long sumInWindowNow() {
+        long result = sumInWindow() + uncounted.get();
+        return result;
+    }
 }
 
